@@ -1,4 +1,4 @@
-.PHONY: all lib example clean
+.PHONY: all lib apps clean
 
 CC = gcc
 
