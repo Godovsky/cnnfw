@@ -53,6 +53,7 @@ typedef struct {
 
 typedef struct {
     int isChanged;
+    ACTIVATION_FUNCTION actFunc;
     EPSILON eps;
     LEARNING_STEP step;
     size_t structureSize;
@@ -60,7 +61,6 @@ typedef struct {
     size_t layLen;
     p_LAYER Lays;
     DATA_TRAIN Data;
-    ACTIVATION_FUNCTION actFunc;
 } PRIVATE, *p_PRIVATE;
 
 
@@ -178,9 +178,9 @@ int create(N_NET *NNetwork, CONFIG *config, size_t configSize, DATA_ROWS rows) {
     for (i = 0; i < prvt->Data.rows; i++)
         prvt->Data.data[i] = (double *)(prvt->Data.data + prvt->Data.rows) + i * prvt->Data.cols;
 
-    for (i = 0; i < rows; i++) {
-        prvt->Data.data[i] = (double *)(prvt->Data.data + rows) + i * prvt->Data.cols;
-        for (j = 0; j < rows; j++) {
+    for (i = 0; i < prvt->Data.rows; i++) {
+        prvt->Data.data[i] = (double *)(prvt->Data.data + prvt->Data.rows) + i * prvt->Data.cols;
+        for (j = 0; j < prvt->Data.cols; j++) {
             prvt->Data.data[i][j] = 0.0;
         }
     }
