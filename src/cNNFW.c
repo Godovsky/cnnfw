@@ -60,10 +60,11 @@ typedef struct {
     size_t layLen;
     p_LAYER Lays;
     DATA_TRAIN Data;
+    ACTIVATION_FUNCTION actFunc;
 } PRIVATE, *p_PRIVATE;
 
 
-int create(N_NET *NNetwork, CONFIG *config, size_t configSize, EPSILON eps, LEARNING_STEP step, DATA_ROWS rows) {
+int create(N_NET *NNetwork, CONFIG *config, size_t configSize, DATA_ROWS rows) {
     size_t i, j, inp, neu, wei, lay;
     size_t bytes = 0;
     size_t inpBytes = 0, layBytes = 0, neuBytes = 0, weiBytes = 0, dataBytes = 0;
@@ -125,9 +126,6 @@ int create(N_NET *NNetwork, CONFIG *config, size_t configSize, EPSILON eps, LEAR
     }
     prvt->isChanged = 0;
 
-    prvt->eps = eps;
-    prvt->step = step;
-
     prvt->structureSize = bytes;
     prvt->Inps.inpLen = config[0];
     prvt->Inps.inputs = (double *)(prvt + 1);
@@ -186,6 +184,10 @@ int create(N_NET *NNetwork, CONFIG *config, size_t configSize, EPSILON eps, LEAR
             prvt->Data.data[i][j] = 0.0;
         }
     }
+
+    prvt->actFunc = ENABLE;
+    prvt->eps = 0.01;
+    prvt->step = 0.01;
 
     *NNetwork = (N_NET)prvt;
 
@@ -282,10 +284,27 @@ int CNNFW_Calculate(N_NET NNetwork) {
 
             if (lay == prvt->layLen - 1) {
                 prvt->Lays[prvt->layLen - 1].neurons[neu].value = tmp;
-            } else
-                prvt->Lays[lay].neurons[neu].value = ActivationFunction(tmp + prvt->Lays[lay].bias);
+            } else {
+                if (prvt->actFunc == ENABLE) {
+                    prvt->Lays[lay].neurons[neu].value = ActivationFunction(tmp + prvt->Lays[lay].bias);
+                } else if (prvt->actFunc == DISABLE) {
+                    prvt->Lays[lay].neurons[neu].value = tmp + prvt->Lays[lay].bias;
+                }
+            }
         }
     }
+
+    return 0;
+}
+
+int CNNFW_SetActivationFunction(N_NET NNetwork, ACTIVATION_FUNCTION state) {
+    p_PRIVATE prvt = (p_PRIVATE)NNetwork;
+    if (NULL == prvt) {
+        printf("the pointer to the neural network cannot be NULL\n");
+        return 1;
+    }
+
+    prvt->actFunc = state;
 
     return 0;
 }

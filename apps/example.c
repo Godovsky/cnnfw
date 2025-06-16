@@ -46,10 +46,23 @@ int main(int argc, char *argv[]) {
     } else {
         printf("Creating a new Neural Network\n");
         /* Creating a Neural Network */
-        if (CNNFW_Create(&NNetwork, config, 0.01, 0.01, NUM_OF_DATA_ROWS)) {
+        if (CNNFW_Create(&NNetwork, config, NUM_OF_DATA_ROWS)) {
             printf("Error of Neural Network creating\n");
             return 1;
         }
+
+        /* By default, the epsilon and learning step are set to 0.01.
+        You can set other values for epsilon and learning step */
+        /* if (CNNFW_SetEpsilonAndLearningStep(NNetwork, 0.1, 0.001)) {
+            printf("error of setting epsilon and learning step values\n");
+            return 1;
+        } */
+
+        /* The activation function is enabled by default, but you can disable it */
+        /* if (CNNFW_SetActivationFunction(NNetwork, DISABLE)) {
+            printf("Error of enabling activation function\n");
+            return 1;
+        } */
 
         /* Writing data for training to an Neural Network */
         printf("Writting data\n");

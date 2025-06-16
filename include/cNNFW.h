@@ -23,7 +23,10 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE. */
 #ifndef CCNNFW_H
 #define CCNNFW_H
 
-#include <stdio.h>
+/* Values DISABLE or ENABLE for the activation function */
+typedef enum {
+    DISABLE, ENABLE
+} ACTIVATION_FUNCTION;
 
 /* The object of the Neural Network */
 typedef void *N_NET;
@@ -46,7 +49,9 @@ typedef double LEARNING_STEP;
 
 /** Creating a neural network using the specified parameters in the config array.
 * Use the CNNFW_Create(config) macro to create a neural network to avoid errors
-* with configuration size
+* with configuration size. The epsilon and learning step are set to 0.01 by default for each,
+* use CNNFW_SetEpsilonAndLearningStep function to set other values. By default,
+* the activation function is enabled, use CNNFW_SetActivationFunction to change
 *
 * @param   NNetwork Neural Network object
 * @param   config   Array of neural network configuration.
@@ -61,19 +66,25 @@ typedef double LEARNING_STEP;
 *                   there are three outputs,
 *                   the first hidden layer has 4 neurons,
 *                   the second hidden layer has 5 neurons
-* @param   eps      Epsilon traditionally denotes a small value for
-*                   numerical approximations
-* @param   step     Learning step
 * @param   rows     Number of rows in the data. The number of data
 *                   columns is taken from the neural network
 *                   configuration and it is equal to the number of
 *                   inputs plus the number of outputs
 * @return           Pointer to neural network. NULL in case of an error
 */
-#define CNNFW_Create(NNetwork, config, eps, step, rows) create((NNetwork), (config), sizeof((config))/sizeof((config)[0]), (eps), (step), (rows))
+#define CNNFW_Create(NNetwork, config, rows) create((NNetwork), (config), sizeof((config))/sizeof((config)[0]), (rows))
 /** Use the CNNFW_Create(config) macro to create a neural network to avoid errors
 * with configuration size */
-int create(N_NET *NNetwork, CONFIG *config, size_t configSize, EPSILON eps, LEARNING_STEP step, DATA_ROWS rows);
+int create(N_NET *NNetwork, CONFIG *config, size_t configSize, DATA_ROWS rows);
+
+
+/** The function of enabling or disabling the activation function
+*
+* @param    NNetwork    Neural Network object
+* @param    state       The state is ENABLE or DISABLE
+* @return               0 in case of success, 1 in case of error
+*/
+int CNNFW_SetActivationFunction(N_NET NNetwork, ACTIVATION_FUNCTION state);
 
 
 /** Creating an object that will store data for training
